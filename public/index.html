@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseSphere | CodeAlpha Social Media Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Lucide Icons or FontAwesome via CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- App Wrapper -->
+  <div class="app-layout">
+
+    <!-- LEFT SIDEBAR: Navigation -->
+    <aside class="sidebar-left">
+      <div class="brand" id="brand-logo">
+        <div class="brand-icon">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Pulse<span class="brand-accent">Sphere</span></span>
+          <span class="brand-badge">CodeAlpha Task 2</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" id="nav-feed" data-view="feed">
+          <i class="fa-solid fa-house"></i>
+          <span>Home Feed</span>
+        </button>
+
+        <button class="nav-item" id="nav-my-profile" data-view="profile" style="display: none;">
+          <i class="fa-solid fa-user"></i>
+          <span>My Profile</span>
+        </button>
+
+        <button class="nav-item auth-only" id="nav-create-btn" style="display: none;">
+          <i class="fa-solid fa-feather-pointed"></i>
+          <span>New Post</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar User Profile Card / Auth Action -->
+      <div class="sidebar-user" id="sidebar-user-section">
+        <!-- Will be rendered dynamically via JS -->
+      </div>
+    </aside>
+
+    <!-- CENTER COLUMN: Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Sticky Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Home Feed</h1>
+        </div>
+
+        <div class="header-search">
+          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+          <input type="text" id="search-input" placeholder="Search posts, tags, or creators...">
+          <button id="clear-search-btn" class="clear-search-btn" style="display: none;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW 1: Feed View -->
+      <section id="feed-view" class="view-section active">
+        <!-- Feed Filter Tabs -->
+        <div class="feed-tabs">
+          <button class="tab-btn active" data-feed="all" id="tab-all-feed">
+            <i class="fa-solid fa-globe"></i>
+            <span>For You</span>
+          </button>
+          <button class="tab-btn" data-feed="following" id="tab-following-feed">
+            <i class="fa-solid fa-user-group"></i>
+            <span>Following</span>
+            <span class="tab-badge" id="following-feed-count" style="display: none;">0</span>
+          </button>
+        </div>
+
+        <!-- Post Creation Card (Visible when logged in) -->
+        <div class="card create-post-card" id="create-post-container" style="display: none;">
+          <div class="create-post-avatar-col">
+            <img id="creator-avatar" class="avatar" src="" alt="User Avatar">
+          </div>
+          <div class="create-post-input-col">
+            <textarea id="post-content-input" placeholder="What's happening in your dev world today?" maxlength="2000" rows="3"></textarea>
+            
+            <!-- Optional Image Preview -->
+            <div id="image-preview-container" class="image-preview-container" style="display: none;">
+              <img id="image-preview" src="" alt="Post image preview">
+              <button type="button" id="remove-preview-btn" class="remove-preview-btn">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <!-- Image URL Input drawer (collapsible) -->
+            <div id="image-url-drawer" class="image-url-drawer" style="display: none;">
+              <i class="fa-solid fa-link"></i>
+              <input type="url" id="post-image-url-input" placeholder="Paste an image URL (Unsplash, Imgur, etc.)...">
+              <button type="button" id="apply-image-btn" class="btn btn-secondary btn-sm">Attach</button>
+            </div>
+
+            <div class="create-post-actions">
+              <div class="attachment-actions">
+                <button type="button" class="action-pill-btn" id="toggle-image-drawer-btn" title="Add Image URL">
+                  <i class="fa-regular fa-image"></i>
+                  <span>Photo URL</span>
+                </button>
+                <span class="char-counter" id="char-counter">0 / 2000</span>
+              </div>
+              <button type="button" id="publish-post-btn" class="btn btn-primary">
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Publish</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Guest Prompt Card (Visible when NOT logged in) -->
+        <div class="guest-banner-card" id="guest-prompt-banner">
+          <div class="guest-banner-content">
+            <div class="guest-banner-icon">
+              <i class="fa-solid fa-sparkles"></i>
+            </div>
+            <div>
+              <h3>Join the Conversation!</h3>
+              <p>Log in or create a free account to publish posts, join discussions, follow tech friends, and like updates.</p>
+            </div>
+          </div>
+          <div class="guest-banner-actions">
+            <button class="btn btn-outline" id="guest-login-btn">Log In</button>
+            <button class="btn btn-primary" id="guest-register-btn">Sign Up Free</button>
+          </div>
+        </div>
+
+        <!-- Posts Stream Container -->
+        <div id="posts-stream" class="posts-stream">
+          <div class="feed-loader">
+            <div class="spinner"></div>
+            <p>Loading community posts...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: User Profile View -->
+      <section id="profile-view" class="view-section" style="display: none;">
+        <div class="profile-header-card">
+          <!-- Back button -->
+          <button class="btn-back" id="profile-back-btn">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Back to Feed</span>
+          </button>
+
+          <!-- Banner & Avatar Cover -->
+          <div class="profile-banner">
+            <div class="profile-banner-overlay"></div>
+          </div>
+
+          <div class="profile-info-row">
+            <div class="profile-avatar-wrapper">
+              <img id="profile-avatar" class="profile-avatar" src="" alt="Profile Avatar">
+            </div>
+            <div class="profile-header-actions" id="profile-action-container">
+              <!-- Dynamically populated: Follow/Unfollow button OR Edit Profile button -->
+            </div>
+          </div>
+
+          <div class="profile-bio-box">
+            <h2 id="profile-full-name" class="profile-name">User Name</h2>
+            <div class="profile-handle" id="profile-username">@username</div>
+            <p class="profile-bio-text" id="profile-bio">User bio description...</p>
+            
+            <div class="profile-meta">
+              <span class="meta-item">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span id="profile-joined-date">Joined recently</span>
+              </span>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="profile-stats">
+              <div class="stat-item">
+                <strong id="profile-posts-count">0</strong>
+                <span>Posts</span>
+              </div>
+              <div class="stat-item" id="stat-followers-clickable">
+                <strong id="profile-followers-count">0</strong>
+                <span>Followers</span>
+              </div>
+              <div class="stat-item" id="stat-following-clickable">
+                <strong id="profile-following-count">0</strong>
+                <span>Following</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Title for Profile Posts -->
+        <div class="profile-posts-heading">
+          <h3><i class="fa-solid fa-layer-group"></i> Posts by <span id="profile-posts-owner">user</span></h3>
+        </div>
+
+        <!-- User's Individual Posts Stream -->
+        <div id="user-posts-stream" class="posts-stream">
+          <!-- Rendered dynamically -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT SIDEBAR: Widgets -->
+    <aside class="sidebar-right">
+
+      <!-- Widget 1: Who To Follow -->
+      <div class="widget-card">
+        <div class="widget-header">
+          <h3><i class="fa-solid fa-user-plus"></i> Suggested People</h3>
+        </div>
+        <div id="suggested-users-list" class="suggested-users-list">
+          <div class="widget-loading">Loading suggestions...</div>
+        </div>
+      </div>
+
+      <!-- Widget 2: Platform Information / Demo Credentials -->
+      <div class="widget-card info-widget">
+        <div class="widget-header">
+          <h3><i class="fa-solid fa-circle-info"></i> Quick Demo Access</h3>
+        </div>
+        <p class="widget-desc">Test with pre-seeded internship profiles or create your own:</p>
+        <div class="demo-account-buttons">
+          <button class="demo-btn" data-account="alex_dev">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=50" alt="Alex">
+            <span>Login as <strong>Alex</strong></span>
+          </button>
+          <button class="demo-btn" data-account="sarah_tech">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=50" alt="Sarah">
+            <span>Login as <strong>Sarah</strong></span>
+          </button>
+          <button class="demo-btn" data-account="codealpha_team">
+            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=50" alt="CodeAlpha">
+            <span>Login as <strong>CodeAlpha</strong></span>
+          </button>
+        </div>
+        <div class="internship-badge">
+          <span>Task 2: Social Media Platform</span>
+          <small>CodeAlpha Full Stack Web Dev</small>
+        </div>
+      </div>
+
+      <!-- Footer credits -->
+      <footer class="sidebar-footer">
+        <p>© 2026 CodeAlpha Internship · Task 2 Full Stack</p>
+        <p>Built with Node.js, Express, SQLite & Vanilla JS</p>
+      </footer>
+    </aside>
+
+  </div>
+
+  <!-- MODAL 1: Authentication Modal (Login / Register) -->
+  <div id="auth-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="auth-modal-close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="auth-modal-header">
+        <div class="auth-modal-icon">
+          <i class="fa-solid fa-bolt-lightning"></i>
+        </div>
+        <h2 id="auth-modal-title">Sign In to PulseSphere</h2>
+        <p id="auth-modal-subtitle">Connect with developers and share your journey.</p>
+      </div>
+
+      <!-- Form Switcher Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tab-show-login">Login</button>
+        <button class="auth-tab-btn" id="tab-show-register">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form">
+        <div class="form-group">
+          <label for="login-username"><i class="fa-solid fa-user"></i> Username or Email</label>
+          <input type="text" id="login-username" required placeholder="alex_dev or alex@example.com" autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+          <input type="password" id="login-password" required placeholder="Enter your password" autocomplete="current-password">
+        </div>
+
+        <div class="form-error" id="login-error" style="display: none;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="login-submit-btn">
+          <span>Log In</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="register-form" class="auth-form" style="display: none;">
+        <div class="form-group">
+          <label for="register-name"><i class="fa-solid fa-signature"></i> Full Name</label>
+          <input type="text" id="register-name" required placeholder="e.g. John Doe">
+        </div>
+
+        <div class="form-group">
+          <label for="register-username"><i class="fa-solid fa-at"></i> Username</label>
+          <input type="text" id="register-username" required placeholder="e.g. johndoe (alphanumeric)" pattern="^[a-zA-Z0-9_.-]+$">
+        </div>
+
+        <div class="form-group">
+          <label for="register-email"><i class="fa-solid fa-envelope"></i> Email Address</label>
+          <input type="email" id="register-email" required placeholder="john@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="register-password"><i class="fa-solid fa-lock"></i> Password (min 6 chars)</label>
+          <input type="password" id="register-password" required minlength="6" placeholder="Choose a secure password">
+        </div>
+
+        <div class="form-group">
+          <label for="register-bio"><i class="fa-solid fa-quote-left"></i> Short Bio (optional)</label>
+          <input type="text" id="register-bio" placeholder="Software engineer exploring full stack tech...">
+        </div>
+
+        <div class="form-error" id="register-error" style="display: none;"></div>
+
+        <button type="submit" class="btn btn-primary btn-block" id="register-submit-btn">
+          <span>Create Account</span>
+          <i class="fa-solid fa-user-plus"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: Edit Profile Modal -->
+  <div id="edit-profile-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="edit-profile-close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="auth-modal-header">
+        <div class="auth-modal-icon">
+          <i class="fa-solid fa-user-pen"></i>
+        </div>
+        <h2>Edit Profile</h2>
+        <p>Update your public display information.</p>
+      </div>
+
+      <form id="edit-profile-form" class="auth-form">
+        <div class="form-group">
+          <label for="edit-name"><i class="fa-solid fa-signature"></i> Full Name</label>
+          <input type="text" id="edit-name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-avatar"><i class="fa-solid fa-image"></i> Avatar Image URL</label>
+          <input type="url" id="edit-avatar" placeholder="https://example.com/avatar.jpg">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-bio"><i class="fa-solid fa-quote-left"></i> Bio</label>
+          <textarea id="edit-bio" rows="3" maxlength="300" placeholder="Tell the community about yourself..."></textarea>
+        </div>
+
+        <div class="form-error" id="edit-profile-error" style="display: none;"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="edit-profile-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="edit-profile-save">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/js/api.js"></script>
+  <script src="/js/state.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

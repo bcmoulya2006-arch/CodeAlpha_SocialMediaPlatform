@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "start",
+      "isBackground": true,
+      "problemMatcher": [],
+      "label": "npm: start",
+      "detail": "node server.js"
+    },
+    {
+      "type": "npm",
+      "script": "test",
+      "isBackground": false,
+      "problemMatcher": [],
+      "label": "npm: test",
+      "detail": "node test-e2e.js"
+    }
+  ]
+}

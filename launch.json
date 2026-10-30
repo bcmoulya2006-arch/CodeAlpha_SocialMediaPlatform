@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🚀 Start PulseSphere Social Platform",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "program": "${workspaceFolder}/server.js",
+      "restart": true,
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Run Task 2 E2E Tests",
+      "skipFiles": ["<node_internals>/**"],
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "program": "${workspaceFolder}/test-e2e.js",
+      "console": "integratedTerminal"
+    }
+  ]
+}
